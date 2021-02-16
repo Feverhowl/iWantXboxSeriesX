@@ -1,18 +1,15 @@
 package org.deangould.iWantXboxSeriesX.telegram.nonCommand;
 
-import org.apache.commons.io.IOUtils;
+import org.deangould.iWantXboxSeriesX.Utils;
 import org.deangould.iWantXboxSeriesX.exceptions.IllegalSettingsException;
+import org.deangould.iWantXboxSeriesX.objects.City;
 import org.deangould.iWantXboxSeriesX.telegram.Bot;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @author Dmitrii Zolotarev
@@ -72,33 +69,12 @@ public class NonCommand {
     /**
      * Валидация настроек
      */
-    private void validateSettings(String text) throws IOException, ParseException{
-        JSONObject jsonObj = getJsonObject(Settings.dataFile);
-        JSONArray array = (JSONArray) jsonObj.get("city");
-        for (Object element: array) {
-            JSONObject innerObject = (JSONObject) element;
-            if (text.equals(innerObject.get("name"))) return;
+    private void validateSettings(String text) {
+        List<City> cities = Utils.cities;
+        for (City element: cities) {
+            if (text.equals(element.getName())) return;
         }
         throw new IllegalSettingsException("\uD83D\uDCA9 Указанный город отсутствует в списке отслеживаемых.");
-    }
-
-    public JSONObject getJsonObject(String jsonFilePath) throws IOException, ParseException {
-        logger.debug("Получение JSON-объекта");
-        JSONObject jsonObject = null;
-        try {
-            if (jsonFilePath == null || jsonFilePath.isEmpty())
-                throw new FileNotFoundException("Путь к файлу JSON не задан");
-            JSONParser parser = new JSONParser();
-            jsonObject = (JSONObject) parser.parse(IOUtils.toString(NonCommand.class.getResourceAsStream(jsonFilePath),
-                    StandardCharsets.UTF_8));
-        } catch (FileNotFoundException e) {
-            logger.debug(String.format("JSON-файл не был найден - %s - %s", e.getClass().getName(), e.getMessage()));
-            e.printStackTrace();
-        } catch (IOException | ParseException e) {
-            logger.debug(String.format("Ошибка парсинга JSON из файла - %s", jsonFilePath));
-            throw e;
-        }
-        return jsonObject;
     }
 
     /**

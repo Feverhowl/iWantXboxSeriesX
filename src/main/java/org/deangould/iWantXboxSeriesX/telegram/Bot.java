@@ -2,6 +2,10 @@ package org.deangould.iWantXboxSeriesX.telegram;
 
 import lombok.Getter;
 import org.deangould.iWantXboxSeriesX.Utils;
+import org.deangould.iWantXboxSeriesX.telegram.commands.service.HelpCommand;
+import org.deangould.iWantXboxSeriesX.telegram.commands.service.ListCommand;
+import org.deangould.iWantXboxSeriesX.telegram.commands.service.SettingsCommand;
+import org.deangould.iWantXboxSeriesX.telegram.commands.service.StartCommand;
 import org.deangould.iWantXboxSeriesX.telegram.nonCommand.NonCommand;
 import org.deangould.iWantXboxSeriesX.telegram.nonCommand.Settings;
 import org.slf4j.Logger;
@@ -29,12 +33,12 @@ public final class Bot extends TelegramLongPollingCommandBot {
     private static final Settings defaultSettings = new Settings("Москва");
     private final NonCommand nonCommand;
 
-    @Getter
-    private static Map<Long, Settings> userSettings;
-
     /**
      * Настройки файла для разных пользователей. Ключ - уникальный id чата
      */
+    @Getter
+    private static Map<Long, Settings> userSettings;
+
     public Bot(String botName, String botToken) {
         super();
         logger.debug("Конструктор суперкласса отработал");
@@ -42,10 +46,14 @@ public final class Bot extends TelegramLongPollingCommandBot {
         this.BOT_TOKEN = botToken;
         logger.debug("Имя и токен присвоены");
         this.nonCommand = new NonCommand();
-//        register(new StartCommand("start", "Старт"));
+        register(new StartCommand("start", "Старт"));
         logger.debug("Команда start зарегистрирована");
-//        register(new SettingsCommand("settings", "Мои настройки"));
+        register(new SettingsCommand("settings", "Мои настройки"));
         logger.debug("Команда settings зарегистрирована");
+        register(new HelpCommand("help", "Помощь"));
+        logger.debug("Команда help зарегистрирована");
+        register(new ListCommand("list", "Список"));
+        logger.debug("Команда list зарегистрирована");
         userSettings = new HashMap<>();
         logger.info("Бот создан!");
     }
